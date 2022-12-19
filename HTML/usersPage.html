@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../CSS/style.css" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"
+      integrity="sha512-xIPqqrfvUAc/Cspuj7Bq0UtHNo/5qkdyngx6Vwt+tmbvTLDszzXM0G6c91LXmGrRx8KEPulT+AfOOez+TeVylg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+      integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <title>Kafene - User Page</title>
+  </head>
+
+  <body>
+    <div class="main-nav">
+      <div class="logo-div">
+        <img src="../logo.58169365.png" alt="logo" />
+        <p class="brand">Kafene</p>
+      </div>
+      <nav>
+        <a href="orderPage.html">Orders</a>
+        <a href="productPage.html">Products</a>
+        <a href="usersPage.html" id="Users">Users</a>
+      </nav>
+      <p id="logout" onclick="logOut()">Logout</p>
+    </div>
+
+    <div class="maincontainer">
+      <h1>Users</h1>
+
+      <form class="User_Filter">
+        <input
+          class="User_Search"
+          type="search"
+          id="search-box"
+          placeholder="Search Here.."
+        /><input
+          type="reset"
+          onclick="resetUser()"
+          class="listButton"
+          value="Reset"
+        />
+      </form>
+
+      <div class="orderHome">
+        <table class="HomeOrderTable">
+          <tr>
+            <th>ID</th>
+            <th>User Avatar</th>
+            <th>Full Name</th>
+            <th>DoB</th>
+            <th>Gender</th>
+            <th>Current Location</th>
+          </tr>
+          <tbody id="tableData">
+            <tr></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      let status = window.localStorage.getItem("loginStatus");
+      function logOut() {
+        window.localStorage.setItem("loginStatus", "false");
+        window.location.href = "index.html";
+      }
+      const resetUser = () => {
+        axios
+          .get("https://5fc1a1c9cb4d020016fe6b07.mockapi.io/api/v1/users")
+          .then(function (response) {
+            var mydatas = response.data;
+            console.log(mydatas);
+            $("#search-box").on("keyup", function () {
+              let value = $(this).val();
+              console.log(value);
+              if (value.length < 2) {
+                alert(" Enter atleast 2 characters ");
+              }
+              var data1 = searchTable(value, mydatas);
+              console.log("This is data1", data1);
+              buildTAbledata(data1);
+            });
+            buildTAbledata(mydatas);
+            function searchTable(value, mydatas) {
+              var filtereddata = [];
+              for (let i = 0; i < mydatas.length; i++) {
+                value = value.toLowerCase();
+                var name = mydatas[i].fullName.toLowerCase();
+                if (name.includes(value)) {
+                  filtereddata.push(mydatas[i]);
+                }
+              }
+              return filtereddata;
+            }
+            function buildTAbledata(data1) {
+              var x = "";
+              data1.forEach((itemData) => {
+                x += "<tr >";
+                x += "<td>" + itemData.id + "</td>";
+                x += "<td>" + `<img src=${itemData.profilePic}/>` + "</td>";
+                x += "<td>" + itemData.fullName + "</td>";
+                x += "<td>" + itemData.dob + "</td>";
+                x += "<td>" + itemData.gender + "</td>";
+                x +=
+                  "<td>" +
+                  itemData.currentCity +
+                  " " +
+                  itemData.currentCountry +
+                  "</td></tr>";
+              });
+              document.getElementById("tableData").innerHTML = x;
+            }
+          })
+          .catch(function (error) {})
+          .then(function () {});
+      };
+      resetUser();
+    </script>
+  </body>
+</html>

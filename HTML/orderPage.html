@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../CSS/style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;900&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.0.0-alpha.1/axios.min.js"
+      integrity="sha512-xIPqqrfvUAc/Cspuj7Bq0UtHNo/5qkdyngx6Vwt+tmbvTLDszzXM0G6c91LXmGrRx8KEPulT+AfOOez+TeVylg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <title>Kafene - Ordere Page</title>
+  </head>
+
+  <body>
+    <div class="main-nav">
+      <div class="logo-div">
+        <img src="../logo.58169365.png" alt="logo" />
+        <p class="brand">Kafene</p>
+      </div>
+      <nav>
+        <a href="orderPage.html" id="orders">Orders</a>
+        <a href="productPage.html">Products</a>
+        <a href="usersPage.html">Users</a>
+      </nav>
+      <p id="logout" onclick="logOut()">Logout</p>
+    </div>
+
+    <div class="maincontainer">
+      <h1>Orders</h1>
+      <div class="homes">
+        <div id="filters">
+          <p id="filtxt">Filters</p>
+          <p id="count">Count:0</p>
+          <div>
+            <p>
+              <label class="checkbox"
+                ><input
+                  type="checkbox"
+                  name="orders"
+                  value="New"
+                  checked
+                  onclick="userDetails()"
+                />New</label
+              >
+            </p>
+            <p>
+              <label class="checkbox"
+                ><input
+                  type="checkbox"
+                  name="orders"
+                  value="Packed"
+                  checked
+                  onclick="userDetails()"
+                />Packed</label
+              >
+            </p>
+            <p>
+              <label class="checkbox"
+                ><input
+                  type="checkbox"
+                  name="orders"
+                  value="InTransit"
+                  checked
+                  onclick="userDetails()"
+                />InTransit</label
+              >
+            </p>
+            <p>
+              <label class="checkbox"
+                ><input
+                  type="checkbox"
+                  name="orders"
+                  value="Delivered"
+                  checked
+                  onclick="userDetails()"
+                />Delievered</label
+              >
+            </p>
+          </div>
+        </div>
+
+        <table class="HomeOrderTable">
+          <tr>
+            <th>ID</th>
+            <th>Customer</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+          </tr>
+
+          <tbody id="tableData">
+            <tr></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      let status = window.localStorage.getItem("loginStatus");
+      function logOut() {
+        window.localStorage.setItem("loginStatus", "false");
+        window.location.href = "index.html";
+      }
+      const userDetails = () => {
+        axios
+          .get("https://5fc1a1c9cb4d020016fe6b07.mockapi.io/api/v1/orders")
+          .then(function (response) {
+            var data = response.data;
+            console.log(data);
+            let checkedArray = [];
+            let filtredData = [];
+            document.getElementById("tableData").innerHTML = "";
+            var ordered = document.getElementsByName("orders");
+
+            var total = 0;
+            for (var i = 0; i < ordered.length; i++) {
+              if (ordered[i].checked) {
+                checkedArray.push(ordered[i].value);
+                console.log("ordered " + ordered[i].value);
+              }
+            }
+            let filtredDataTotal = data.filter((item) =>
+              checkedArray.includes(item.orderStatus)
+            );
+            console.log("filtredDataTotal " + filtredDataTotal);
+            var x = " ";
+            filtredDataTotal.forEach((itemData) => {
+              x += "<tr >";
+              x += "<td>" + itemData.id + "</td>";
+              x += "<td>" + itemData.customerName + "</td>";
+              x += "<td>" + itemData.orderDate + "</td>";
+              x += "<td>" + itemData.amount + "</td>";
+              x += "<td>" + itemData.orderStatus + "</td></tr>";
+            });
+            document.getElementById("tableData").innerHTML = x;
+
+            total = filtredDataTotal.length;
+            let mycount1 = document.getElementById("count");
+            mycount1.innerHTML = `Count: ${total}`;
+          });
+      };
+      userDetails();
+    </script>
+  </body>
+</html>
